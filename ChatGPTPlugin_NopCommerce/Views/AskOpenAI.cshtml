@@ -1,0 +1,114 @@
+﻿@{
+    NopHtml.AppendCssFileParts("~/Plugins/Widgets.AskToOpenAI/Content/CSS/style.css");
+    NopHtml.AppendScriptParts(ResourceLocation.Footer,"~/Plugins/Widgets.AskToOpenAI/Content/js/askToOpenAI.js");
+
+    NopHtml.AppendCssFileParts("~/Plugins/Widgets.AskToOpenAI/Content/CSS/modaal.css");
+    NopHtml.AppendScriptParts(ResourceLocation.Footer, "~/Plugins/Widgets.AskToOpenAI/Content/js/modaal.js");
+}
+@model Nop.Plugin.Widgets.AskToOpenAI.Models.ChatGPTModel
+
+
+<div class="ask-vendor">
+    <button type="button" class="button-2 ask-vendor-button modaal"
+            data-modaal-content-source="#askopenai" data-modaal-type="inline" data-modaal-animation="fade">
+        @T("Plugin.Widgets.AskToOpenAI.Button")
+    </button>
+</div>
+
+<div id="askopenai" style="display:none;">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chatbox</title>
+    </head>
+    <body>
+        <div class="chatbox">
+            <div class="message">
+                @T("chatgpt.chatbox")</div>
+            <select id="questionSelect">
+                @foreach (var question in Model.Questions)
+                {
+                    <option value='@question'>@question</option>
+                }
+            </select>
+            <button onclick="sendMessage()">@T("chatgpt.send")</button>
+        </div>
+    </body>
+</html>
+</div>
+
+
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .chatbox {
+        width: 300px;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .message {
+        background-color: #f0f0f0;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    select {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+
+    button {
+        padding: 5px 10px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    .user-message {
+        background-color: #45F284;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .chatgpt-message {
+        background-color: #f0f0f0;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 5px;
+    }
+</style>
+
+
+<script>
+    function sendMessage() {
+        const select = document.getElementById('questionSelect');
+        const selectedValue = select.value;
+        const messageBox = document.querySelector('.chatbox');
+        displayMessage('@T("chatgpt.user")', selectedValue);
+
+        $.get('/MessageController/GetResponse',
+            { userQuestion: selectedValue },
+            function (data, textStatus, jqXHR) {
+                displayMessage("ChatGPT", data);
+            });
+    }
+    function displayMessage(sender, message) {
+        const messageBox = document.querySelector('.chatbox');
+        const newMessage = document.createElement('div');
+        const messageClass = sender === '@T("chatgpt.user")' ? "user-message" : "chatgpt-message";
+        newMessage.className = `message ${messageClass}`;
+        newMessage.textContent = `${sender}: ${message}`;
+        messageBox.appendChild(newMessage);
+    }
+</script>

@@ -1,0 +1,83 @@
+﻿@using Nop.Web.Areas.Admin.Components
+@model Nop.Plugin.Widgets.AskToOpenAI.Models.ConfigurationModel
+
+
+@{
+    Layout = "_ConfigurePlugin";
+}
+
+@await Component.InvokeAsync(typeof(StoreScopeConfigurationViewComponent))
+
+<form asp-controller="ChatGPT" asp-action="Configure" method="post" asp-antiforgery="true">
+    <section class="content">
+        <div class="container">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="form-group">
+                        <input asp-for="ApiKey_override" style="display: none;" />
+                        <label asp-for="ApiKey" class="form-label">@T("chatgpt.apikey"):</label>
+                        <input asp-for="ApiKey" class="form-control" />
+                        <span asp-validation-for="ApiKey" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+        <label class="form-label">@T("chatgpt.question"):</label>
+        <div class="questions-container">
+            <input type="number" id="questionCount" name="QuestionCount" class="form-control" placeholder=@T("chatgpt.noq") />
+            <button type="submit" name="generate" value="true" class="btn btn-secondary">@T("chatgpt.generate")</button>
+            <div class="text-danger" id="questionCountError" style="display: none;">@T("chatgpt.max")</div>
+        </div>
+    </div>
+                    <div class="card mb-3">
+                        <div class="card-body" id="generatedQuestions">
+                            @for (int i = 1; i <= Model.QuestionCount; i++)
+                            {
+                                <div class="form-group">
+                                    <input name="Question_@i" class="form-control" placeholder="Question @i" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" name="save" class="btn btn-primary">@T("Admin.Common.Save")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>
+
+<style>
+    .container {
+        max-width: 800px;
+        padding: 20px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-label {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .text-danger {
+        color: #ff0000;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+</style>
